@@ -3,11 +3,6 @@ package de.ritzenbergen.raudonistablist;
 import de.ritzenbergen.raudonistablist.pluginmsg.PluginMsg;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.messaging.PluginMessageListener;
-
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 
 import static org.bukkit.Bukkit.getMessenger;
 
@@ -17,8 +12,8 @@ public final class RaudonisTablist extends JavaPlugin {
     @Override
     public void onEnable() {
 
-        getMessenger().registerIncomingPluginChannel(this, "my:tab_update", new PluginMsg());
-        getMessenger().registerOutgoingPluginChannel(this, "my:tab_update");
+        getMessenger().registerIncomingPluginChannel(this, "rn:tablistupdate", new PluginMsg());
+        getMessenger().registerOutgoingPluginChannel(this, "rn:tablistupdate");
         log("Plugin gestartet!");
     }
 
