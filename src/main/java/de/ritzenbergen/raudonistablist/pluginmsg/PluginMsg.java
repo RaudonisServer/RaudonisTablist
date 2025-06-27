@@ -11,7 +11,7 @@ import static de.ritzenbergen.raudonistablist.RaudonisTablist.log;
 public class PluginMsg implements PluginMessageListener {
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] message) {
-        if (!channel.equals("my:tab_update")) return;
+        if (!channel.equals("rn:updatetablist")) return;
 
         try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(message))) {
             String action = in.readUTF();
