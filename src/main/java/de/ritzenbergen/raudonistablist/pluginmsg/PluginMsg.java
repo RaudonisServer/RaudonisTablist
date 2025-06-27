@@ -7,6 +7,8 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 
+import static de.ritzenbergen.raudonistablist.RaudonisTablist.log;
+
 public class PluginMsg implements PluginMessageListener {
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] message) {
@@ -18,13 +20,11 @@ public class PluginMsg implements PluginMessageListener {
             String server = in.readUTF();
 
             switch (action) {
-                case "join":
-                    break;
                 case "switch":
-
+                    log("Tablist-Änderung: switch "+name+" "+server);
                     break;
                 case "quit":
-
+                    log("Tablist-Änderung: quit "+name);
                     break;
             }
 
