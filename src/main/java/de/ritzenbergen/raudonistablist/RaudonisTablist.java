@@ -17,6 +17,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -25,8 +27,7 @@ import static org.bukkit.Bukkit.getMessenger;
 
 public final class RaudonisTablist extends JavaPlugin implements Listener {
 
-    public static final String PREFIX="§cRaudonisTablist §b>> §r";
-
+    public static final Logger LOGGER = LoggerFactory.getLogger("RaudonisTablist");
     private ProtocolManager protocolManager;
 
     @Override
@@ -34,28 +35,23 @@ public final class RaudonisTablist extends JavaPlugin implements Listener {
         protocolManager = ProtocolLibrary.getProtocolManager();
         getMessenger().registerIncomingPluginChannel(this, "rn:updatetablist", new PluginMsg());
         getMessenger().registerOutgoingPluginChannel(this,"rn:updatetablist");
-        log("Plugin gestartet!");
+        LOGGER.info("Plugin gestartet!");
         Bukkit.getServer().getPluginManager().registerEvents(this,this);
 
     }
 
     @Override
     public void onDisable() {
-
-
-        log("Plugin gestoppt!");
-    }
-
-    public static void log(String text){
-        Bukkit.getConsoleSender().sendMessage(PREFIX+text);
+        LOGGER.info("Plugin gestoppt!");
     }
 
     @EventHandler
     private void joinEvent(PlayerJoinEvent event) {
         sendPlayerPacket("TestFakePlayer");
     }
+
     public void sendPlayerPacket(String playername){
-        log(playername);
+        LOGGER.info(playername);
         UUID uuid = UUID.randomUUID();
         WrappedGameProfile profile = new WrappedGameProfile(uuid, playername);
 
@@ -75,12 +71,12 @@ public final class RaudonisTablist extends JavaPlugin implements Listener {
 
 
         try {
-            log(packet.toString());
+            LOGGER.info(packet.toString());
             for(Player player : Bukkit.getOnlinePlayers()){
                 protocolManager.sendServerPacket(player, packet);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+           throw new RuntimeException(e);
         }
     }
 
