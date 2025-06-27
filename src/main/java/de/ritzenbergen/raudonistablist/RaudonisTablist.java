@@ -13,6 +13,7 @@ public final class RaudonisTablist extends JavaPlugin {
     public void onEnable() {
 
         getMessenger().registerIncomingPluginChannel(this, "rn:updatetablist", new PluginMsg());
+        getMessenger().registerOutgoingPluginChannel(this,"rn:updatetablist");
         log("Plugin gestartet!");
     }
 
