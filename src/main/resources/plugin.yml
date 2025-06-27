@@ -4,3 +4,4 @@ main: de.ritzenbergen.raudonistablist.RaudonisTablist
 api-version: '1.21'
 authors: [ R40fendt ]
 description: Tablist Fake-Player Plugin, um Spieler auf anderen Servern anzuzeigen
+depend: [ProtocolLib]
