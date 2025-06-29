@@ -6,8 +6,6 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 
-import static de.ritzenbergen.raudonistablist.RaudonisTablist.LOGGER;
-import static de.ritzenbergen.raudonistablist.RaudonisTablist.log;
 
 public class PluginMsg implements PluginMessageListener {
     @Override
