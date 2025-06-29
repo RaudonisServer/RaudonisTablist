@@ -4,21 +4,22 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.reflect.accessors.FieldAccessor;
+import com.comphenix.protocol.wrappers.*;
+import com.comphenix.protocol.wrappers.EnumWrappers.NativeGameMode;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import de.ritzenbergen.raudonistablist.pluginmsg.PluginMsg;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.function.Function;
 
 import static org.bukkit.Bukkit.getMessenger;
 
@@ -52,34 +53,39 @@ public final class RaudonisTablist extends JavaPlugin implements Listener {
 
     @EventHandler
     private void joinEvent(PlayerJoinEvent event) {
-        sendPlayerPacket("TestFakePlayer");
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                for(Player player : Bukkit.getOnlinePlayers()) {
+                    log(player.getName());
+                    sendPlayerPacket("TestFakePlayer", player);
+                }
+            }
+        }.runTaskLater(this,20);
     }
-    public void sendPlayerPacket(String playername){
-        log(playername);
-        UUID uuid = UUID.randomUUID();
-        WrappedGameProfile profile = new WrappedGameProfile(uuid, playername);
+    public void sendPlayerPacket(String playername, Player player){
+        ProtocolManager manager=ProtocolLibrary.getProtocolManager();
 
-        PlayerInfoData infoData = new PlayerInfoData(
-                profile,
-                0,
-                EnumWrappers.NativeGameMode.SURVIVAL,
-                WrappedChatComponent.fromText(playername)
-        );
+        WrappedGameProfile profile= new WrappedGameProfile(UUID.fromString("12345678-1234-5678-1234-567812345678"),playername);
 
-        PacketContainer packet = protocolManager.createPacket(com.comphenix.protocol.PacketType.Play.Server.PLAYER_INFO);
+        PlayerInfoData infoData=new PlayerInfoData(profile, 0, NativeGameMode.fromBukkit(Bukkit.getServer().getDefaultGameMode()),null);
+
+        PacketContainer packet=manager.createPacket(PacketType.Play.Server.PLAYER_INFO);
+
         packet.getPlayerInfoActions().write(0, EnumSet.of(EnumWrappers.PlayerInfoAction.ADD_PLAYER));
 
-        List<PlayerInfoData> dataList = new ArrayList<>();
-        dataList.add(infoData);
-        packet.getPlayerInfoDataLists().write(0, dataList);
+        log(packet.getPlayerInfoDataLists().getField(0).getType().toString());
 
+        packet.getPlayerInfoDataLists().write(1, List.of(infoData));
+
+        for(FieldAccessor accessor : packet.getPlayerInfoDataLists().getFields()){
+            log(accessor.getField().toString());
+        }
 
         try {
             log(packet.toString());
-            for(Player player : Bukkit.getOnlinePlayers()){
-                protocolManager.sendServerPacket(player, packet);
-            }
-        } catch (Exception e) {
+            manager.sendServerPacket(player, packet);
+        }catch(Exception e){
             e.printStackTrace();
         }
     }
