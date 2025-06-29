@@ -2,9 +2,10 @@ package de.ritzenbergen.raudonistablist.pluginmsg;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
-
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+
+import static de.ritzenbergen.raudonistablist.RaudonisTablist.LOGGER;
 
 
 public class PluginMsg implements PluginMessageListener {
@@ -28,7 +29,7 @@ public class PluginMsg implements PluginMessageListener {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

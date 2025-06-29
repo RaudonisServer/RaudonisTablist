@@ -17,45 +17,43 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static org.bukkit.Bukkit.createCommandSender;
 import static org.bukkit.Bukkit.getMessenger;
 
 
 public final class RaudonisTablist extends JavaPlugin implements Listener {
 
-    public static final String PREFIX="§cRaudonisTablist §b>> §r";
-
-    private ProtocolManager protocolManager;
+    public static final Logger LOGGER = LoggerFactory.getLogger("RaudonistTablist");
+    private static ProtocolManager protocolManager;
 
     @Override
     public void onEnable() {
+        LOGGER.info("Starting RaudonisTablist...");
         protocolManager = ProtocolLibrary.getProtocolManager();
         getMessenger().registerIncomingPluginChannel(this, "rn:updatetablist", new PluginMsg());
         getMessenger().registerOutgoingPluginChannel(this,"rn:updatetablist");
-        log("Plugin gestartet!");
         Bukkit.getServer().getPluginManager().registerEvents(this,this);
+        LOGGER.info("Started RaudonisTablist!");
 
     }
 
     @Override
     public void onDisable() {
-
-
-        log("Plugin gestoppt!");
+        LOGGER.info("Stopped RaudonisTablist");
     }
 
-    public static void log(String text){
-        Bukkit.getConsoleSender().sendMessage(PREFIX+text);
-    }
 
     @EventHandler
     private void joinEvent(PlayerJoinEvent event) {
         sendPlayerPacket("TestFakePlayer");
     }
     public void sendPlayerPacket(String playername){
-        log(playername);
+        LOGGER.info(playername);
         UUID uuid = UUID.randomUUID();
         WrappedGameProfile profile = new WrappedGameProfile(uuid, playername);
 
@@ -75,16 +73,21 @@ public final class RaudonisTablist extends JavaPlugin implements Listener {
 
 
         try {
-            log(packet.toString());
+            LOGGER.info(packet.toString());
             for(Player player : Bukkit.getOnlinePlayers()){
                 protocolManager.sendServerPacket(player, packet);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
     public static void sendPlayerDisconnectPacket(String playername){
-
+        /*
+        Is this right???
+         */
+        PacketContainer disconnectPacket = protocolManager.createPacket(PacketType.Play.Server.KICK_DISCONNECT);
+        Player player = Bukkit.getPlayer(playername);
+        protocolManager.sendServerPacket(player, disconnectPacket);
     }
 }
